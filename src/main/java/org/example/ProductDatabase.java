@@ -147,16 +147,5 @@ public class ProductDatabase {
         }
     }
 
-    // 更新商品库存数量（增加）
-    public void increaseProductQuantity(int productId, int quantity) {
-        String sql = "UPDATE products SET nums = nums + ? WHERE productId = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, quantity);
-            pstmt.setInt(2, productId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+    
 }
