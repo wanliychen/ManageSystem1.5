@@ -27,7 +27,7 @@ public class RunShopping {
                     shoppingCart.updateCartItemQuantity();
                     break;
                 case 4:
-                    shoppingCart.getShoppingHistory();
+                    shoppingCart.getPurchaseHistory();
                     break;
                 case 5:
                     shoppingCart.checkout();
