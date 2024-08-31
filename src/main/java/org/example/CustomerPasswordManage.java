@@ -68,6 +68,8 @@ public class CustomerPasswordManage {
         }
     }
 
+    
+
     // 重置密码
     public void resetPassword(String username) {
         System.out.println("输入注册邮箱：");
@@ -76,23 +78,19 @@ public class CustomerPasswordManage {
         String hashedPassword = hashPassword(newPassword);
 
         if (isEmailCorrect(username, email)) {
-            updatePasswordDirectly(username, hashedPassword);
+            //更新密码
+            String sql = "UPDATE customers SET password = ? WHERE username = ?";
+            try (Connection conn = DriverManager.getConnection(DB_URL);
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, hashedPassword);
+                pstmt.setString(2, username);
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println("数据库错误: " + e.getMessage());
+            }
             sendPasswordToEmail(email, newPassword);
         } else {
             System.out.println("用户名或邮箱不正确，密码重置失败！");
-        }
-    }
-
-    // 更新密码
-    private void updatePasswordDirectly(String username, String hashedPassword) {
-        String sql = "UPDATE customers SET password = ? WHERE username = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, hashedPassword);
-            pstmt.setString(2, username);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("数据库错误: " + e.getMessage());
         }
     }
 
