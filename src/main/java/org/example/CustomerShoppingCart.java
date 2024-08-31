@@ -6,7 +6,7 @@ import java.util.*;
 public class CustomerShoppingCart {
     private Map<String, Integer> shoppingCart; // 商品ID和数量的映射
     private ProductDatabase productDatabase;
-    private List<PurchaseHistory> purchaseHistoryList; // 保存购物历史
+    private List<Map<String, Integer>> purchaseHistoryList; // 保存购物历史
     private Scanner scanner = new Scanner(System.in);
 
     public CustomerShoppingCart(Customer customer) {
@@ -38,7 +38,7 @@ public class CustomerShoppingCart {
         }
     }
 
-    //  将商品从购物车中移除
+    // 将商品从购物车中移除
     public void removeFromCart() {
         System.out.println("请输入要移除的商品ID：");
         String productId = scanner.nextLine();
@@ -126,16 +126,14 @@ public class CustomerShoppingCart {
         }
 
         // 保存购买记录
-        PurchaseHistory history = new PurchaseHistory(LocalDateTime.now(), new HashMap<>(shoppingCart));
-        purchaseHistoryList.add(history);
+        purchaseHistoryList.add(new HashMap<>(shoppingCart));
 
         // 清空购物车
         shoppingCart.clear();
         System.out.println("结账成功，购物车已清空！");
     }
 
-
-    //  查看购物历史
+    // 查看购物历史
     public void getShoppingHistory() {
         if (purchaseHistoryList.isEmpty()) {
             System.out.println("暂无购物历史。");
@@ -143,8 +141,9 @@ public class CustomerShoppingCart {
         }
 
         System.out.println("您的购物历史：");
-        for (PurchaseHistory history : purchaseHistoryList) {
-            System.out.println(history);
+        for (Map<String, Integer> history : purchaseHistoryList) {
+            System.out.println("购物时间: " + LocalDateTime.now()); // 或者存储时间信息
+            System.out.println("商品清单: " + history);
         }
     }
 }
