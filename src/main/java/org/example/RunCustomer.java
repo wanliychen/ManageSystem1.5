@@ -1,5 +1,7 @@
 package org.example;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -97,6 +99,7 @@ public class RunCustomer {
         String updateUsername = scanner.nextLine();
         System.out.println("请输入新的密码：");
         String newPassword = scanner.nextLine();
+        String hashPassword =hashPassword(newPassword);
         System.out.println("请输入新的邮箱：");
         String newUseremail = scanner.nextLine();
         System.out.println("请输入新的电话号码：");
@@ -106,7 +109,7 @@ public class RunCustomer {
         System.out.println("请输入新的用户等级：");
         String newUserLevel = scanner.nextLine();
 
-        Customer updatedCustomer = new Customer(updateUsername, newPassword, newUseremail, newPhone, java.sql.Date.valueOf(newRegistrationDate), newUserLevel);
+        Customer updatedCustomer = new Customer(updateUsername, hashPassword, newUseremail, newPhone, java.sql.Date.valueOf(newRegistrationDate), newUserLevel);
         customerDatabase.updateCustomer(updateUsername, updatedCustomer);
         System.out.println("用户更新成功！");
     }
@@ -119,5 +122,19 @@ public class RunCustomer {
         }
     }
 
+    // 使用MD5加密密码
+    private static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+    }
     
 }

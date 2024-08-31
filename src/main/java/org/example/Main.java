@@ -80,6 +80,4 @@ public class Main {
             System.out.println("管理员登录失败！");
         }
     }
-
-    
 } 

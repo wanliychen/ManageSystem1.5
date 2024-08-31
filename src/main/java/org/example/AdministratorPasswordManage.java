@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.util.Random;
 import java.util.Scanner;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+
 public class AdministratorPasswordManage {
     private static final String DB_URL = "jdbc:sqlite:users.db";
     private static final String DEFAULT_ADMIN_USERNAME = "admin";
@@ -62,10 +66,12 @@ public class AdministratorPasswordManage {
         System.out.println("输入用户名：");
         String username = scanner.nextLine();
         String newPassword = generateRandomPassword();
+        String hashPassword=hashPassword(newPassword);//加密处理
+
         String sql = "UPDATE customers SET password = ? WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, newPassword);
+            pstmt.setString(1, hashPassword);
             pstmt.setString(2, username);
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -114,4 +120,18 @@ public class AdministratorPasswordManage {
         return new String(passwordArray);
     }
 
+    // 使用MD5加密
+    private static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+    }
 }
