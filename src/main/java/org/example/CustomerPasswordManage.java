@@ -74,7 +74,13 @@ public class CustomerPasswordManage {
     }
 
     // 重置密码
-    public void resetPassword(String email) {
+    public void resetPassword(String username, String email) {
+
+        if (!isEmailCorrect(username, email)) {
+            System.out.println("用户名或邮箱不正确，密码重置失败！");
+            return;  // 如果邮箱不正确，则退出
+        }
+
         String newPassword = generateRandomPassword();
         try (Connection conn = getConnection()) {
             String updateSQL = "UPDATE customers SET password = ? WHERE useremail = ?";
