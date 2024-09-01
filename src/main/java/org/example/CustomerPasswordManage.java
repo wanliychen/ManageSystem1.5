@@ -2,17 +2,22 @@ package org.example;
 
 import java.util.Random;
 import java.util.Scanner;
+
+import org.sqlite.SQLiteErrorCode;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class CustomerPasswordManage {
     private static final String DB_URL = "jdbc:sqlite:users.db";
+    private static final int MAX_RETRIES = 5; // 最大重试次数
+    private static final int RETRY_DELAY_MS = 1000; // 重试延时1秒
+
     private Scanner scanner = new Scanner(System.in);
 
     // 修改密码
@@ -55,7 +60,7 @@ public class CustomerPasswordManage {
         String sql = "UPDATE customers SET password = ? WHERE username = ? AND password = ?";
         String hashedNewPassword = hashPassword(newPassword);
         String hashedOldPassword = hashPassword(oldPassword);
-        try (Connection conn = DriverManager.getConnection(DB_URL);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, hashedNewPassword);
             pstmt.setString(2, username);
@@ -69,33 +74,54 @@ public class CustomerPasswordManage {
     }
 
     // 重置密码
-    public void resetPassword(String username) {
-        System.out.println("输入注册邮箱：");
-        String email = scanner.nextLine();
+    public void resetPassword(String email) {
         String newPassword = generateRandomPassword();
-        String hashedPassword = hashPassword(newPassword);
-
-        if (isEmailCorrect(username, email)) {
-            //更新密码
-            String sql = "UPDATE customers SET password = ? WHERE username = ?";
-            try (Connection conn = DriverManager.getConnection(DB_URL);
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, hashedPassword);
-                pstmt.setString(2, username);
+        try (Connection conn = getConnection()) {
+            String updateSQL = "UPDATE customers SET password = ? WHERE useremail = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(updateSQL)) {
+                pstmt.setString(1, hashPassword(newPassword));
+                pstmt.setString(2, email);
                 pstmt.executeUpdate();
-            } catch (SQLException e) {
-                System.out.println("数据库错误: " + e.getMessage());
+                System.out.println("密码已重置");
             }
-            sendPasswordToEmail(email, newPassword);
-        } else {
-            System.out.println("用户名或邮箱不正确，密码重置失败！");
+        } catch (SQLException e) {
+            System.out.println("数据库错误: " + e.getMessage());
+            e.printStackTrace();
         }
+
+        // 模拟发送新密码到邮箱
+        sendPasswordToEmail(email, newPassword);
+    }
+
+    // 获取数据库连接，并加入重试机制
+    private Connection getConnection() throws SQLException {
+        int retries = 0;
+        while (retries < MAX_RETRIES) {
+            try {
+                Connection conn = DriverManager.getConnection(DB_URL);
+                return conn;
+            } catch (SQLException e) {
+                if (e.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY.code) {
+                    retries++;
+                    System.out.println("数据库锁定，重试中...");
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);  // 等待一段时间后重试
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new SQLException("重试被中断", ie);
+                    }
+                } else {
+                    throw e;  // 其他异常直接抛出
+                }
+            }
+        }
+        throw new SQLException("无法连接到数据库，重试次数已达上限。");
     }
 
     // 检查邮箱是否正确
     private boolean isEmailCorrect(String username, String email) {
         String sql = "SELECT useremail FROM customers WHERE username = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();

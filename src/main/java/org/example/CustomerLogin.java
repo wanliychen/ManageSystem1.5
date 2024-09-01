@@ -63,8 +63,11 @@ public class CustomerLogin {
                     System.out.println("密码错误，剩余尝试次数：" + (4 - loginAttempts));
                     System.out.println("是否重置密码？y/n");
                     String choice = scanner.nextLine();
+                    
                     if (choice.equals("y")) {
-                        cpm.resetPassword(username); 
+                        System.out.println("输入注册邮箱");
+                        String useremail= scanner.nextLine();
+                        cpm.resetPassword(useremail); 
                     }
                     return false;
                 }
@@ -99,6 +102,4 @@ public class CustomerLogin {
             throw new RuntimeException("MD5 algorithm not found", e);
         }
     }
-
-    
 }
