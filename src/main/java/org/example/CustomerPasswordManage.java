@@ -68,8 +68,6 @@ public class CustomerPasswordManage {
         }
     }
 
-    
-
     // 重置密码
     public void resetPassword(String username) {
         System.out.println("输入注册邮箱：");
@@ -152,7 +150,7 @@ public class CustomerPasswordManage {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
+            throw new RuntimeException("未找到MD5算法", e);
         }
     }
 

@@ -1,44 +1,23 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerDatabase {
-    private static final String DB_URL = "jdbc:sqlite:users.db";
+public class CustomerDatabase extends Database {
 
-    // 初始化数据库连接
-    private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
-    }
-
-    // 初始化数据库的方法
+    // 实现父类的数据库初始化方法
+    @Override
     public void initializeDatabase() {
-        // 使用try-with-resources语句来确保连接和语句在使用后自动关闭
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement()) {
-            // 创建表的SQL查询语句，如果表不存在则创建
-            String createTableQuery = "CREATE TABLE IF NOT EXISTS customers (" +
-                                      "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                                      "username TEXT NOT NULL, " +
-                                      "password TEXT NOT NULL, " +
-                                      "useremail TEXT NOT NULL, " +
-                                      "phone TEXT NOT NULL, " +
-                                      "registrationDate DATE NOT NULL, " +
-                                      "userLevel TEXT NOT NULL)";
-            // 执行SQL查询
-            statement.executeUpdate(createTableQuery);
-            // 输出初始化成功的消息
-            System.out.println("数据库customers初始化成功！");
-        } catch (SQLException e) {
-            // 捕获并输出SQL异常信息
-            System.out.println("数据库customers初始化失败: " + e.getMessage());
-        }
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS customers (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                "username TEXT NOT NULL, " +
+                                "password TEXT NOT NULL, " +
+                                "useremail TEXT NOT NULL, " +
+                                "phone TEXT NOT NULL, " +
+                                "registrationDate DATE NOT NULL, " +
+                                "userLevel TEXT NOT NULL)";
+        createTable(createTableSQL);
     }
 
     // 增加用户信息

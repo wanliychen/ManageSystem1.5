@@ -4,33 +4,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDatabase {
-    private static final String DB_URL = "jdbc:sqlite:users.db";
+public class ProductDatabase extends Database {
 
-    // 初始化数据库连接
-    private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
-    }
-
-    // 初始化数据库和创建表
-    public static void initializeDatabase() {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
-            // 创建 products 表
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS products (" +
-                    "productId TEXT PRIMARY KEY, " +  // 修改为 TEXT 类型
-                    "productName TEXT NOT NULL, " +
-                    "manufacturer TEXT NOT NULL, " +
-                    "model TEXT NOT NULL, " +
-                    "purchasePrice REAL NOT NULL, " +
-                    "retailPrice REAL NOT NULL, " +
-                    "nums INTEGER NOT NULL" +
-                    ")";
-            stmt.execute(createTableSQL);
-            System.out.println("数据库products初始化成功！");
-        } catch (SQLException e) {
-            System.out.println("数据库products初始化失败：" + e.getMessage());
-        }
+    // 实现父类的数据库初始化方法
+    @Override
+    public void initializeDatabase() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS products (" +
+                                "productId TEXT PRIMARY KEY, " +
+                                "productName TEXT NOT NULL, " +
+                                "manufacturer TEXT NOT NULL, " +
+                                "model TEXT NOT NULL, " +
+                                "purchasePrice REAL NOT NULL, " +
+                                "retailPrice REAL NOT NULL, " +
+                                "nums INTEGER NOT NULL)";
+        createTable(createTableSQL);
     }
 
     // 增加商品
@@ -38,7 +25,7 @@ public class ProductDatabase {
         String sql = "INSERT INTO products(productId, productName, manufacturer, model, purchasePrice, retailPrice, nums) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, product.getProductId());  // 修改为 setString
+            pstmt.setString(1, product.getProductId()); 
             pstmt.setString(2, product.getProductName());
             pstmt.setString(3, product.getManufacturer());
             pstmt.setString(4, product.getModel());
@@ -51,17 +38,7 @@ public class ProductDatabase {
         }
     }
 
-    // // 删除商品
-    // public static void deleteProduct(String productId) {  // 修改参数类型为 String
-    //     String sql = "DELETE FROM products WHERE productId = ?";
-    //     try (Connection conn = getConnection();
-    //          PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    //         pstmt.setString(1, productId);  // 修改为 setString
-    //         pstmt.executeUpdate();
-    //     } catch (SQLException e) {
-    //         System.out.println("删除商品失败：" + e.getMessage());
-    //     }
-    // }
+
     public static void deleteProduct(String productId) {
         String sql = "DELETE FROM products WHERE productId = ?";
         

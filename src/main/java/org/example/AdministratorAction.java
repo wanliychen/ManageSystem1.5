@@ -1,27 +1,39 @@
 package org.example;
 
-
 import java.util.Scanner;
 
-public class AdministratorAction {
-    public void run(){
-        Scanner scanner=new Scanner(System.in);
-        
-        RunProduct runProduct=new RunProduct();
-        RunCustomer runCustomer=new RunCustomer();
-        AdministratorPasswordManage apm=new AdministratorPasswordManage();
-        Administrator admin=new Administrator();
+public class AdministratorAction implements Actionable {
+    private Scanner scanner;
 
-        while(true){
+    public AdministratorAction() {
+        this.scanner = new Scanner(System.in);
+    }
+
+    @Override
+    public void displayMenu() {
+        System.out.println("请选择操作：");
+        System.out.println("1. 商品管理");
+        System.out.println("2. 用户管理");
+        System.out.println("3. 密码管理");
+        System.out.println("4. 退出管理员登录");
+    }
+
+    @Override
+    public void run() {
+        RunProduct runProduct = new RunProduct();
+        RunCustomer runCustomer = new RunCustomer();
+        AdministratorPasswordManage apm = new AdministratorPasswordManage();
+        Administrator admin = new Administrator();
+
+        while (true) {
             displayMenu();
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // 消耗换行符
 
-
             switch (choice) {
                 case 1:
-                    runProduct.run();;
+                    runProduct.run();
                     break;
                 case 2:
                     runCustomer.run();
@@ -38,14 +50,4 @@ public class AdministratorAction {
             }
         }
     }
-
-    private void displayMenu(){
-        System.out.println("请选择操作：");
-        System.out.println("1. 商品管理");
-        System.out.println("2. 用户管理");
-        System.out.println("3. 密码管理");
-        System.out.println("4. 退出管理员登录");
-    }
-    
 }
-

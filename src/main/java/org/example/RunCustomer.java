@@ -1,12 +1,12 @@
 package org.example;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import java.util.List;
 import java.util.Scanner;
 
-public class RunCustomer {
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class RunCustomer implements Actionable {
     private Scanner scanner;
     private CustomerDatabase customerDatabase;
 
@@ -15,6 +15,18 @@ public class RunCustomer {
         this.customerDatabase = new CustomerDatabase();
     }
 
+    @Override
+    public void displayMenu() {
+        System.out.println("请选择操作：");
+        System.out.println("1. 增加用户");
+        System.out.println("2. 删除用户");
+        System.out.println("3. 查找用户");
+        System.out.println("4. 更新用户");
+        System.out.println("5. 返回所有用户");
+        System.out.println("6. 退出");
+    }
+
+    @Override
     public void run() {
         while (true) {
             displayMenu();
@@ -47,16 +59,6 @@ public class RunCustomer {
         }
     }
 
-    private void displayMenu() {
-        System.out.println("请选择操作：");
-        System.out.println("1. 增加用户");
-        System.out.println("2. 删除用户");
-        System.out.println("3. 查找用户");
-        System.out.println("4. 更新用户");
-        System.out.println("5. 返回所有用户");
-        System.out.println("6. 退出");
-    }
-
     private void addCustomer() {
         System.out.println("请输入用户名：");
         String username = scanner.nextLine();
@@ -71,7 +73,7 @@ public class RunCustomer {
         System.out.println("请输入用户等级：");
         String userLevel = scanner.nextLine();
 
-        String hashPassword=hashPassword(password);
+        String hashPassword = hashPassword(password);
         Customer newCustomer = new Customer(username, hashPassword, useremail, phone, java.sql.Date.valueOf(registrationDate), userLevel);
         customerDatabase.addCustomer(newCustomer);
         System.out.println("用户添加成功！");
@@ -100,7 +102,7 @@ public class RunCustomer {
         String updateUsername = scanner.nextLine();
         System.out.println("请输入新的密码：");
         String newPassword = scanner.nextLine();
-        String hashPassword =hashPassword(newPassword);
+        String hashPassword = hashPassword(newPassword);
         System.out.println("请输入新的邮箱：");
         String newUseremail = scanner.nextLine();
         System.out.println("请输入新的电话号码：");
@@ -137,5 +139,4 @@ public class RunCustomer {
             throw new RuntimeException("MD5 algorithm not found", e);
         }
     }
-    
 }

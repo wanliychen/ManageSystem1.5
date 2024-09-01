@@ -7,7 +7,7 @@ public class Main {
         System.out.println("欢迎使用购物管理系统");
         // admins数据库
         Administrator admin = new Administrator();
-        admin.createTable();
+        admin.initializeDatabase();
         admin.insertDefaultAdmin();
         
         // products数据库

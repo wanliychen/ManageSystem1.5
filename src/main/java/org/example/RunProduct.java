@@ -2,7 +2,7 @@ package org.example;
 
 import java.util.*;
 
-public class RunProduct {
+public class RunProduct implements Actionable {
     private Scanner scanner;
     private ProductDatabase productDatabase;
 
@@ -11,6 +11,18 @@ public class RunProduct {
         this.productDatabase = new ProductDatabase();
     }
 
+    @Override
+    public void displayMenu() {
+        System.out.println("请选择操作：");
+        System.out.println("1. 增加商品");
+        System.out.println("2. 删除商品");
+        System.out.println("3. 查找商品");
+        System.out.println("4. 更新商品");
+        System.out.println("5. 返回所有商品");
+        System.out.println("6. 退出");
+    }
+
+    @Override
     public void run() {
         while (true) {
             displayMenu();
@@ -42,17 +54,7 @@ public class RunProduct {
             }
         }
     }
-
-    private void displayMenu() {
-        System.out.println("请选择操作：");
-        System.out.println("1. 增加商品");
-        System.out.println("2. 删除商品");
-        System.out.println("3. 查找商品");
-        System.out.println("4. 更新商品");
-        System.out.println("5. 返回所有商品");
-        System.out.println("6. 退出");
-    }
-
+    
     private void addProduct() {
         try {
             System.out.println("请输入商品ID：");
