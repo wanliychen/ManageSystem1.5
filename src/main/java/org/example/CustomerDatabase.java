@@ -43,6 +43,15 @@ public class CustomerDatabase extends Database {
 
     // 删除用户信息
     public static void deleteCustomerByUsername(String username) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("您确定要删除商品 " +username + " 吗？该操作不可撤销。 (y/n)");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (!confirmation.equals("y")) {
+            System.out.println("删除操作已取消。");
+            return; // 取消删除操作
+        }
+
         String sql = "DELETE FROM customers WHERE username = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

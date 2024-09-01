@@ -40,8 +40,16 @@ public class ProductDatabase extends Database {
 
 
     public static void deleteProduct(String productId) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("您确定要删除商品 " +productId + " 吗？该操作不可撤销。 (y/n)");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (!confirmation.equals("y")) {
+            System.out.println("删除操作已取消。");
+            return; // 取消删除操作
+        }
+
         String sql = "DELETE FROM products WHERE productId = ?";
-        
         try (Connection conn = getConnection()) {
             // 开始事务
             conn.setAutoCommit(false);

@@ -45,15 +45,12 @@ public class CustomerShoppingCart {
     public void removeFromCart() {
         System.out.println("请输入要移除的商品ID：");
         String productId = scanner.nextLine();
-
         if (!shoppingCart.containsKey(productId)) {
             System.out.println("购物车中未找到商品ID " + productId);
             return;
         }
-
         System.out.println("确认要移除商品ID " + productId + " 吗？(yes/no)");
         String confirmation = scanner.nextLine();
-
         if (confirmation.equalsIgnoreCase("yes")) {
             shoppingCart.remove(productId);
             System.out.println("商品已从购物车中移除。");
