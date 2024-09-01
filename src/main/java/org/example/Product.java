@@ -1,21 +1,19 @@
 package org.example;
 
-
-
 public class Product {
-    private int productId;
+    private String productId; // 修改为 String 类型
     private String productName;
     private String manufacturer;
     private String model;
     private double purchasePrice;
     private double retailPrice;
     private int nums;
-    public Product(){
-        
+
+    public Product() {
     }
 
-    public Product(int productId, String productName, String manufacturer, String model, double purchasePrice, double retailPrice, int nums) {
-        this.productId = productId;
+    public Product(String productId, String productName, String manufacturer, String model, double purchasePrice, double retailPrice, int nums) {
+        this.productId = productId; // 修改为 String 类型
         this.productName = productName;
         this.manufacturer = manufacturer;
         this.model = model;
@@ -24,12 +22,11 @@ public class Product {
         this.nums = nums;
     }
 
-    // Getters and Setters
-    public int getProductId() {
+    public String getProductId() { // 修改为 String 类型
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(String productId) { // 修改为 String 类型
         this.productId = productId;
     }
 
@@ -84,7 +81,7 @@ public class Product {
     @Override
     public String toString() {
         return "Product{" +
-                "productId=" + productId +
+                "productId='" + productId + '\'' +
                 ", productName='" + productName + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
                 ", model='" + model + '\'' +

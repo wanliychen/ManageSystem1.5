@@ -1,8 +1,6 @@
 package org.example;
 
-
 import java.util.*;
-
 
 public class RunProduct {
     private Scanner scanner;
@@ -16,7 +14,7 @@ public class RunProduct {
     public void run() {
         while (true) {
             displayMenu();
-            
+
             int choice = scanner.nextInt();
             scanner.nextLine(); // 消耗换行符
 
@@ -58,8 +56,7 @@ public class RunProduct {
     private void addProduct() {
         try {
             System.out.println("请输入商品ID：");
-            int productId = scanner.nextInt();
-            scanner.nextLine(); // 消耗换行符
+            String productId = scanner.nextLine();  // 修改为 String
             System.out.println("请输入商品名称：");
             String productName = scanner.nextLine();
             System.out.println("请输入制造商：");
@@ -75,7 +72,7 @@ public class RunProduct {
             System.out.println("请输入数量：");
             int nums = scanner.nextInt();
             scanner.nextLine(); // 消耗换行符
-    
+
             Product newProduct = new Product(productId, productName, manufacturer, model, purchasePrice, retailPrice, nums);
             productDatabase.addProduct(newProduct);
             System.out.println("商品添加成功！");
@@ -86,12 +83,11 @@ public class RunProduct {
             System.out.println("发生错误：" + e.getMessage());
         }
     }
-    
+
     private void deleteProduct() {
         try {
             System.out.println("请输入要删除的商品ID：");
-            int deleteProductId = scanner.nextInt();
-            scanner.nextLine(); // 消耗换行符
+            String deleteProductId = scanner.nextLine();  // 修改为 String
             productDatabase.deleteProduct(deleteProductId);
             System.out.println("商品删除成功！");
         } catch (InputMismatchException e) {
@@ -101,12 +97,11 @@ public class RunProduct {
             System.out.println("发生错误：" + e.getMessage());
         }
     }
-    
+
     private void findProduct() {
         try {
             System.out.println("请输入要查找的商品ID：");
-            int findProductId = scanner.nextInt();
-            scanner.nextLine(); // 消耗换行符
+            String findProductId = scanner.nextLine();  // 修改为 String
             Product foundProduct = productDatabase.findProductById(findProductId);
             if (foundProduct != null) {
                 System.out.println("找到商品：");
@@ -127,12 +122,11 @@ public class RunProduct {
             System.out.println("发生错误：" + e.getMessage());
         }
     }
-    
+
     private void updateProduct() {
         try {
             System.out.println("请输入要更新的商品ID：");
-            int updateProductId = scanner.nextInt();
-            scanner.nextLine();
+            String updateProductId = scanner.nextLine();  // 修改为 String
             System.out.println("请输入新的商品名称：");
             String newProductName = scanner.nextLine();
             System.out.println("请输入新的制造商：");
@@ -148,7 +142,7 @@ public class RunProduct {
             System.out.println("请输入新的数量：");
             int newNums = scanner.nextInt();
             scanner.nextLine(); // 消耗换行符
-    
+
             Product updatedProduct = new Product(updateProductId, newProductName, newManufacturer, newModel, newPurchasePrice, newRetailPrice, newNums);
             productDatabase.updateProduct(updateProductId, updatedProduct);
             System.out.println("商品更新成功！");
@@ -159,7 +153,6 @@ public class RunProduct {
             System.out.println("发生错误：" + e.getMessage());
         }
     }
-    
 
     private void displayAllProducts() {
         List<Product> allProducts = productDatabase.getAllProducts();
@@ -168,5 +161,4 @@ public class RunProduct {
             System.out.println(product);
         }
     }
-
 }

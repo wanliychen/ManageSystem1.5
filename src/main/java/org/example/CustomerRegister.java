@@ -65,12 +65,12 @@ public class CustomerRegister {
     }
 
     private boolean registerCustomer(String username, String password, String email, String phone, Date registrationDate, String userLevel) {
-        String encryptedPassword=hashPassword(password);
+        String hashPassword=hashPassword(password);
         String sql = "INSERT INTO customers (username, password, useremail, phone, registrationDate, userLevel) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, encryptedPassword);
+            pstmt.setString(2, hashPassword);
             pstmt.setString(3, email);
             pstmt.setString(4, phone);
             pstmt.setDate(5, registrationDate);

@@ -1,8 +1,7 @@
 package org.example;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -33,7 +32,8 @@ public class CustomerShoppingCart {
             return;
         }
 
-        if (productDatabase.findProductById(Integer.parseInt(productId)) != null) {
+        // 确保findProductById接受String类型的productId
+        if (productDatabase.findProductById(productId) != null) {
             shoppingCart.put(productId, shoppingCart.getOrDefault(productId, 0) + quantity);
             System.out.println("商品成功加入购物车！");
         } else {
@@ -45,7 +45,7 @@ public class CustomerShoppingCart {
     public void removeFromCart() {
         System.out.println("请输入要移除的商品ID：");
         String productId = scanner.nextLine();
-        
+
         if (!shoppingCart.containsKey(productId)) {
             System.out.println("购物车中未找到商品ID " + productId);
             return;
@@ -53,7 +53,7 @@ public class CustomerShoppingCart {
 
         System.out.println("确认要移除商品ID " + productId + " 吗？(yes/no)");
         String confirmation = scanner.nextLine();
-        
+
         if (confirmation.equalsIgnoreCase("yes")) {
             shoppingCart.remove(productId);
             System.out.println("商品已从购物车中移除。");
@@ -123,9 +123,21 @@ public class CustomerShoppingCart {
 
         // 模拟支付成功后更新商品库存
         for (Map.Entry<String, Integer> entry : shoppingCart.entrySet()) {
-            int productId = Integer.parseInt(entry.getKey());
-            int quantity = entry.getValue();
-            productDatabase.updateProductQuantity(productId, quantity);
+            String productId = entry.getKey();
+            int requestedQuantity = entry.getValue();
+
+            // 检查数据库中的库存数量
+            Product product = productDatabase.findProductById(productId);
+            if (product != null) {
+                int availableStock = product.getNums();
+                // 如果购物车中的商品数量超过库存，调整为库存的最大数量
+                if (availableStock < requestedQuantity) {
+                    System.out.println("商品ID " + productId + " 库存不足，调整购买数量为 " + availableStock + " 件。");
+                    shoppingCart.put(productId, availableStock);
+                }
+            }
+            // 更新数据库中的库存
+            productDatabase.updateProductQuantity(productId, requestedQuantity);
         }
 
         // 保存购买记录
@@ -136,7 +148,7 @@ public class CustomerShoppingCart {
         System.out.println("结账成功，购物车已清空！");
     }
 
-   // 查看购物历史
+    // 查看购物历史
     public void getPurchaseHistory() {
         if (purchaseHistoryList.isEmpty()) {
             System.out.println("暂无购物历史。");
@@ -152,7 +164,13 @@ public class CustomerShoppingCart {
             String formattedDateTime = beijingTime.format(formatter);
 
             System.out.println("购物时间: " + formattedDateTime);
-            System.out.println("商品清单: " + history);
+            System.out.println("商品清单:");
+
+            for (Map.Entry<String, Integer> entry : history.entrySet()) {
+                String productId = entry.getKey();
+                int quantity = entry.getValue();
+                System.out.println("商品ID: " + productId + ", 数量: " + quantity);
+            }
         }
     }
 }

@@ -1,11 +1,6 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +18,7 @@ public class ProductDatabase {
              Statement stmt = conn.createStatement()) {
             // 创建 products 表
             String createTableSQL = "CREATE TABLE IF NOT EXISTS products (" +
-                    "productId INTEGER PRIMARY KEY, " +
+                    "productId TEXT PRIMARY KEY, " +  // 修改为 TEXT 类型
                     "productName TEXT NOT NULL, " +
                     "manufacturer TEXT NOT NULL, " +
                     "model TEXT NOT NULL, " +
@@ -34,7 +29,7 @@ public class ProductDatabase {
             stmt.execute(createTableSQL);
             System.out.println("数据库products初始化成功！");
         } catch (SQLException e) {
-            System.out.println("数据库products初始化失败" +e.getMessage());
+            System.out.println("数据库products初始化失败：" + e.getMessage());
         }
     }
 
@@ -43,7 +38,7 @@ public class ProductDatabase {
         String sql = "INSERT INTO products(productId, productName, manufacturer, model, purchasePrice, retailPrice, nums) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, product.getProductId());
+            pstmt.setString(1, product.getProductId());  // 修改为 setString
             pstmt.setString(2, product.getProductName());
             pstmt.setString(3, product.getManufacturer());
             pstmt.setString(4, product.getModel());
@@ -52,31 +47,53 @@ public class ProductDatabase {
             pstmt.setInt(7, product.getNums());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("添加商品失败：" + e.getMessage());
         }
     }
 
-    // 删除商品
-    public static void deleteProduct(int productId) {
+    // // 删除商品
+    // public static void deleteProduct(String productId) {  // 修改参数类型为 String
+    //     String sql = "DELETE FROM products WHERE productId = ?";
+    //     try (Connection conn = getConnection();
+    //          PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    //         pstmt.setString(1, productId);  // 修改为 setString
+    //         pstmt.executeUpdate();
+    //     } catch (SQLException e) {
+    //         System.out.println("删除商品失败：" + e.getMessage());
+    //     }
+    // }
+    public static void deleteProduct(String productId) {
         String sql = "DELETE FROM products WHERE productId = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, productId);
-            pstmt.executeUpdate();
+        
+        try (Connection conn = getConnection()) {
+            // 开始事务
+            conn.setAutoCommit(false);
+            
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, productId);
+                pstmt.executeUpdate();
+                // 提交事务
+                conn.commit();
+            } catch (SQLException e) {
+                // 如果发生异常，回滚事务
+                conn.rollback();
+                System.out.println("删除商品失败：" + e.getMessage());
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("数据库操作失败：" + e.getMessage());
         }
     }
+    
 
     // 查找商品（通过ID）
-    public static Product findProductById(int productId) {
+    public static Product findProductById(String productId) {  // 修改参数类型为 String
         String sql = "SELECT * FROM products WHERE productId = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, productId);
+            pstmt.setString(1, productId);  // 修改为 setString
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                int productIdResult = rs.getInt("productId");
+                String productIdResult = rs.getString("productId");  // 修改为 getString
                 String productName = rs.getString("productName");
                 String manufacturer = rs.getString("manufacturer");
                 String model = rs.getString("model");
@@ -87,14 +104,14 @@ public class ProductDatabase {
                 return new Product(productIdResult, productName, manufacturer, model, purchasePrice, retailPrice, nums);
             }
         } catch (SQLException e) {
-            System.out.println("Error finding product: " + e.getMessage());
+            System.out.println("查找商品失败：" + e.getMessage());
         }
         return null;
     }
 
     // 更新商品
-    public static void updateProduct(int productId, Product updatedProduct) {
-        String sql = "UPDATE products SET productName = ?, manufacturer = ?,  model = ?, purchasePrice = ?, retailPrice = ?, nums = ? WHERE productId = ?";
+    public static void updateProduct(String productId, Product updatedProduct) {  // 修改参数类型为 String
+        String sql = "UPDATE products SET productName = ?, manufacturer = ?, model = ?, purchasePrice = ?, retailPrice = ?, nums = ? WHERE productId = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, updatedProduct.getProductName());
@@ -103,10 +120,10 @@ public class ProductDatabase {
             pstmt.setDouble(4, updatedProduct.getPurchasePrice());
             pstmt.setDouble(5, updatedProduct.getRetailPrice());
             pstmt.setInt(6, updatedProduct.getNums());
-            pstmt.setInt(7, productId);
+            pstmt.setString(7, productId);  // 修改为 setString
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("更新商品失败：" + e.getMessage());
         }
     }
 
@@ -118,7 +135,7 @@ public class ProductDatabase {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                int productId = rs.getInt("productId");
+                String productId = rs.getString("productId");  // 修改为 getString
                 String productName = rs.getString("productName");
                 String manufacturer = rs.getString("manufacturer");
                 String model = rs.getString("model");
@@ -129,23 +146,35 @@ public class ProductDatabase {
                 products.add(new Product(productId, productName, manufacturer, model, purchasePrice, retailPrice, nums));
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching products: " + e.getMessage());
+            System.out.println("获取商品失败：" + e.getMessage());
         }
         return products;
     }
 
-    // 更新商品库存数量（减少）
-    public void updateProductQuantity(int productId, int quantity) {
+    // 更新商品库存数量
+    public void updateProductQuantity(String productId, int quantity) {  // 修改参数类型为 String
         String sql = "UPDATE products SET nums = nums - ? WHERE productId = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, quantity);
-            pstmt.setInt(2, productId);
+            pstmt.setString(2, productId);  // 修改为 setString
             pstmt.executeUpdate();
+
+            // 检查更新后的库存数量是否 <= 0，若是则删除该商品
+            String checkStockSql = "SELECT nums FROM products WHERE productId = ?";
+            try (PreparedStatement pstmtCheckStock = conn.prepareStatement(checkStockSql)) {
+                pstmtCheckStock.setString(1, productId);
+                ResultSet rs = pstmtCheckStock.executeQuery();
+                if (rs.next()) {
+                    int remainingStock = rs.getInt("nums");
+                    if (remainingStock <= 0) {
+                        deleteProduct(productId);  // 删除库存为 0 或负数的商品
+                        System.out.println("商品ID " + productId + " 已从库存中删除（库存不足）。");
+                    }
+                }
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("更新库存失败：" + e.getMessage());
         }
     }
-
-    
 }
